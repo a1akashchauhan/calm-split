@@ -25,11 +25,27 @@ No sign-up, no app download.
 
 AI reads the language. Plain code does the maths. If AI isn't available, a rule-based reader takes over and flags more for review.
 
+## Shareable links
+
+On the web, **Calculate and save** stores the split and gives it a link like `calmsplit.vercel.app/s/Ab3dEf7hJk2m`. Anyone with the link can open the same dashboard, fix entries and save again. No sign-up.
+
+- Splits are stored in Upstash Redis for a year after their last save.
+- Saves use a version check: if someone saved while you were editing, you choose between loading their version or saving yours over it.
+- Each save is logged with the editor's name.
+
+### Set it up on Vercel
+
+1. Import this repo in Vercel. No build settings are needed.
+2. In the project, open **Storage** (or the Marketplace), add **Upstash for Redis**, and connect it to the project. It adds `KV_REST_API_URL` and `KV_REST_API_TOKEN` (or `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN`), and the API reads either.
+3. Redeploy.
+
+API: `POST /api/splits` creates a split, `GET /api/splits/:id` reads it, `PUT /api/splits/:id` with `baseVersion` saves it.
+
 ## Stack
 
-A single `index.html`: HTML, CSS and vanilla JavaScript, with JSZip from cdnjs for `.zip` exports. Fonts: Fraunces, Roboto Mono and Caveat from Google Fonts.
+A single `index.html` (HTML, CSS and vanilla JavaScript, with JSZip from cdnjs for `.zip` exports) plus two small Vercel functions in `api/`. Fonts: Fraunces, Roboto Mono and Caveat from Google Fonts.
 
-When it runs as a Claude artifact, it uses Claude to read chats and stores splits in the artifact's database. Anywhere else it falls back to the rule-based reader and browser storage. A hosted version needs a small backend for shareable links and an AI endpoint.
+When it runs as a Claude artifact, it uses Claude to read chats and stores splits in the artifact's database. On the web it saves through the API above and reads chats with the rule-based reader. An AI endpoint for the web version is next.
 
 ## Run locally
 

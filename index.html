@@ -291,7 +291,7 @@ footer{border-top:1px solid var(--line);padding:28px 0 40px;font-size:12px;color
 .pc-e{display:flex;justify-content:space-between;font-size:12px}
 .pc-m{font-size:10px;color:var(--mute);margin-top:2px}
 .pc-m .part,.exp-meta .part{color:var(--onact);background:var(--act);border-radius:5px;padding:0 5px}
-.settle-hi{background:var(--act);border-color:var(--act);color:var(--onact);border-radius:18px}
+.settle-hi,.panel.settle-hi{background:var(--act);border-color:var(--act);color:var(--onact);border-radius:18px}
 .t3 .settle-hi{padding:10px 16px 4px}
 .settle-hi .label,.settle-hi .totals,.settle-hi .empty,.settle-hi .pay .pays{color:var(--onact);opacity:.7}
 .settle-hi .pay{border-bottom-color:color-mix(in srgb,var(--onact) 18%,transparent);padding:9px 0}
@@ -301,6 +301,9 @@ footer{border-top:1px solid var(--line);padding:28px 0 40px;font-size:12px;color
 .t3 .settle-hi .pay .nm{font-size:13px}
 .t3 .settle-hi .pay{padding:6px 0}
 
+.linkbox{display:flex;gap:8px}
+.linkbox input{font-size:12px;padding:8px 10px}
+.wa-btn{text-decoration:none;background:var(--tick);border-color:var(--tick);color:var(--ontick)}
 /* Setup + dashboard */
 .view{display:none}
 .view.on{display:block}
@@ -854,15 +857,44 @@ const EXAMPLE=`12/03/26, 7:02 am - Akash: Leaving at 7:30, everyone ready?
 13/03/26, 8:30 pm - Yash: other stuff 2666
 13/03/26, 8:31 pm - Yash: <Media omitted>`;
 
-/* ---------- Data layer: db when the page can, browser storage otherwise ---------- */
-let dbRef=null;const dbReady=(async()=>{try{dbRef=await Promise.race([window.claude.use("db"),new Promise(r=>setTimeout(()=>r(null),6000))])}catch(e){dbRef=null}})();
-async function saveSplit(s){
-  store.set("cs-split-"+s.id,s);
-  await dbReady;
-  if(dbRef){try{await dbRef.doc("splits/"+s.id).set(JSON.parse(JSON.stringify(s)));return "shared"}catch(e){return "local"}}
-  return "local";
+/* ---------- Data layer: hosted API on the web, artifact db on claude.ai, browser storage as fallback ---------- */
+const HOSTED=!window.claude&&/^https?:$/.test(location.protocol);
+let dbRef=null;const dbReady=HOSTED?Promise.resolve():(async()=>{try{dbRef=await Promise.race([window.claude.use("db"),new Promise(r=>setTimeout(()=>r(null),6000))])}catch(e){dbRef=null}})();
+const shareUrl=s=>location.origin+"/s/"+s.id;
+function payload(s){return {name:s.name,members:s.members,expenses:s.expenses,history:s.history||[],transfers:s.transfers||[],savedTotal:s.savedTotal||0,savedAt:s.savedAt||0,readBy:s.readBy||""}}
+async function api(path,method,body){
+  try{const r=await fetch(path,{method,headers:{"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined});
+    let data={};try{data=await r.json()}catch(e){}return {status:r.status,data}}
+  catch(e){return {status:0,data:{error:"You seem to be offline."}}}
 }
-async function loadSplit(id){
+// returns {ok:true, where} | {conflict:{split,version}} | {error}
+async function saveSplit(s,force){
+  store.set("cs-split-"+s.id,s);
+  if(HOSTED){
+    if(!s.remote){
+      const r=await api("/api/splits","POST",{split:payload(s)});
+      if(r.status!==201)return {error:r.data.error||"Couldn't save. Try again."};
+      try{localStorage.removeItem("cs-split-"+s.id)}catch(e){}
+      s.id=r.data.id;s.version=r.data.version;s.remote=true;store.set("cs-split-"+s.id,s);
+      history.replaceState(null,"","/s/"+s.id);return {ok:true,where:"created"};
+    }
+    const r=await api("/api/splits/"+s.id,"PUT",{split:payload(s),baseVersion:force||s.version});
+    if(r.status===200){s.version=r.data.version;store.set("cs-split-"+s.id,s);return {ok:true,where:"shared"}}
+    if(r.status===409)return {conflict:r.data};
+    return {error:r.data.error||"Couldn't save. Try again."};
+  }
+  await dbReady;
+  if(dbRef){try{await dbRef.doc("splits/"+s.id).set(JSON.parse(JSON.stringify(s)));return {ok:true,where:"shared"}}catch(e){return {ok:true,where:"local"}}}
+  return {ok:true,where:"local"};
+}
+async function loadSplit(id,remote){
+  if(HOSTED&&remote){
+    const r=await api("/api/splits/"+id,"GET");
+    if(r.status===200){const sp=r.data.split;sp.remote=true;sp.version=r.data.version;return sp}
+    if(r.status===404)return null;
+    const cached=store.get("cs-split-"+id);if(cached)return cached;
+    return {__error:r.data.error||"Couldn't reach the server."};
+  }
   await dbReady;
   if(dbRef){try{const snap=await dbRef.doc("splits/"+id).get();if(snap.exists)return snap.data()}catch(e){}}
   return store.get("cs-split-"+id);
@@ -873,21 +905,24 @@ let S=null;let savedCore="";
 function core(s){return JSON.stringify({n:s.name,m:s.members,e:s.expenses})}
 function route(){
   const h=location.hash.replace("#","");
-  const home=!h||h==="home"||h==="how-to";
+  const pm=HOSTED&&!h?location.pathname.match(/^\/s\/([A-Za-z0-9]{12})\/?$/):null;
+  const home=(!h&&!pm)||h==="home"||h==="how-to";
   $("#v-home").classList.toggle("on",home);$("#v-home-rest").classList.toggle("on",home);
   $("#v-setup").classList.toggle("on",h==="new");
-  const dash=h.startsWith("split-");$("#v-dash").classList.toggle("on",dash);
+  const dash=h.startsWith("split-")||!!pm;$("#v-dash").classList.toggle("on",dash);
   $("#hero").classList.toggle("scene-on",home);requestAnimationFrame(()=>scene.paint());
   if(h==="new")buildSetup();
-  if(dash){const id=h.slice(6);if(!S||S.id!==id)openSplit(id)}
+  if(dash){const id=pm?pm[1]:h.slice(6);if(!S||S.id!==id)openSplit(id,!!pm)}
   setTimeout(()=>{storyUpd&&storyUpd();friendUpd&&friendUpd()},60);
   if(h==="how-to"){const el=$("#how-to");el&&el.scrollIntoView({behavior:"smooth"})}else window.scrollTo(0,0);
 }
 window.addEventListener("hashchange",route);
 
-async function openSplit(id){
+async function openSplit(id,remote){
   $("#dashBody").innerHTML='<div class="loading">Opening the split…</div>';
-  const s=await loadSplit(id);
+  const s=await loadSplit(id,remote);
+  if(s&&s.__error){$("#dashBody").innerHTML=`<div class="loading">${esc(s.__error)}<br><br><button class="btn" onclick="location.reload()">Try again</button></div>`;return}
+  if(!s&&remote){$("#dashBody").innerHTML='<div class="loading">No split with that link. It may have been mistyped or expired.<br><br><a class="btn" href="/">Back home</a></div>';return}
   if(!s){$("#dashBody").innerHTML='<div class="loading">This split isn\'t on this device. Ask whoever made it to share the dashboard link again.<br><br><a class="btn" href="#home">Back home</a></div>';return}
   S=s;savedCore=s.savedAt?core(s):"";render();
 }
@@ -1007,8 +1042,7 @@ function render(){
       <div class="panel settle settle-hi" id="settle">${settleHTML()}</div>
       <div class="panel">
         <span class="label">Share</span>
-        <p style="font-size:13px;color:var(--mute);margin:8px 0 12px">Use Share at the top of this page to copy its link. It opens this exact split. Or copy the summary for WhatsApp.</p>
-        <button class="btn small" id="copySum">Copy summary</button>
+        ${shareHTML()}
         <div class="copy-out" id="copyOut" role="status"></div>
       </div>
       ${S.history&&S.history.length?`<div class="panel"><span class="label">Changes</span><ul class="hist">${S.history.slice().reverse().slice(0,8).map(h=>`<li>${esc(h.by)} saved · ${new Date(h.at).toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"})}<br>${esc(h.what)}</li>`).join("")}</ul></div>`:""}
@@ -1050,6 +1084,19 @@ function expRow(e){
    ${open.src.has(e.id)&&e.src?`<div class="src">${esc(e.src.sender)} · ${esc(e.src.time)}\n${esc(e.src.text)}</div>`:""}
   </div>`;
 }
+function summaryText(){
+  const lines=[`CalmSplit · ${S.name}`,`Total ${rs(S.savedTotal)} · ${S.members.length} people`,"",...(S.transfers.length?S.transfers.map(t=>`${nameOf(t.from)} pays ${nameOf(t.to)}  ${rs(t.amt)}`):["Everyone's square."]),""];
+  lines.push(HOSTED&&S.remote?"Check your entries: "+shareUrl(S):"Open the dashboard link to check your entries.");
+  return lines.join("\n");
+}
+function shareHTML(){
+  if(!HOSTED)return `<p style="font-size:13px;color:var(--mute);margin:8px 0 12px">Use Share at the top of this page to copy its link. It opens this exact split. Or copy the summary for WhatsApp.</p><button class="btn small" id="copySum">Copy summary</button>`;
+  if(!S.remote)return `<p style="font-size:13px;color:var(--mute);margin:8px 0 0">Press Calculate and save once to get a link for the group.</p>`;
+  const wa="https://wa.me/?text="+encodeURIComponent(summaryText());
+  return `<p style="font-size:13px;color:var(--mute);margin:8px 0 10px">Anyone with this link can see and fix this split. No sign-up.</p>
+   <div class="linkbox"><input type="text" readonly value="${esc(shareUrl(S))}" id="shareUrl" aria-label="Link to this split"><button class="btn small" id="copyLink">Copy link</button></div>
+   <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><a class="btn small wa-btn" href="${esc(wa)}" target="_blank" rel="noopener">Send on WhatsApp</a><button class="btn small" id="copySum">Copy summary</button></div>`;
+}
 function settleHTML(){
   if(!S.savedAt)return `<span class="label">Who pays whom</span><p class="empty">Check the spends, then press Calculate and save.</p>`;
   const t=S.transfers||[];
@@ -1065,6 +1112,13 @@ function animateSettle(){
 function setDirty(){const d=core(S)!==savedCore;const n=$("#saveNote");if(n){n.className="save-note "+(d?"":"ok");n.textContent=d?"Unsaved changes. Press Calculate and save to update the link.":""}}
 document.addEventListener("click",ev=>{if(open.people.size&&!ev.target.closest(".pop-wrap")){open.people.clear();render()}});
 document.addEventListener("keydown",ev=>{if(ev.key==="Escape"&&open.people.size){open.people.clear();render()}});
+function showConflict(c){
+  const btn=$("#saveBtn");btn.disabled=false;btn.textContent="Calculate and save";
+  const last=(c.split.history||[]).slice(-1)[0];
+  $("#saveErr").innerHTML=`${esc(last?last.by:"Someone")} saved a newer version while you were editing. Your changes aren't saved yet.<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><button class="btn small" id="takeTheirs">Load their version</button><button class="btn small" id="keepMine">Save mine over it</button></div>`;
+  $("#takeTheirs").onclick=()=>{const sp=c.split;sp.remote=true;sp.version=c.version;S=sp;savedCore=core(S);render()};
+  $("#keepMine").onclick=async()=>{S.version=c.version;$("#saveBtn").click()};
+}
 function bind(){
   $("#tripName").oninput=e=>{S.name=e.target.value;setDirty()};
   $("#meIn").oninput=e=>store.set("cs-me",e.target.value.trim());
@@ -1102,15 +1156,22 @@ function bind(){
     const r=settle(S.members,S.expenses);
     S.transfers=r.transfers;S.savedTotal=r.total;S.savedAt=Date.now();
     S.history=(S.history||[]).concat({by,at:S.savedAt,what:`${S.expenses.length} spends · ${rs(r.total)} · ${r.transfers.length} payments`}).slice(-30);
-    const where=await saveSplit(S);savedCore=core(S);render();animateSettle();
-    $("#saveNote").textContent=where==="shared"?"Saved. Anyone with the link sees this version.":"Saved on this device. A live shared link needs the hosted version.";
+    $("#saveBtn").disabled=true;$("#saveBtn").textContent="Saving…";
+    const res=await saveSplit(S);
+    if(res.conflict){showConflict(res.conflict);return}
+    if(res.error){$("#saveBtn").disabled=false;$("#saveBtn").textContent="Calculate and save";$("#saveErr").textContent=res.error+" Your changes are still here.";return}
+    savedCore=core(S);render();animateSettle();
+    $("#saveNote").textContent=res.where==="created"?"Saved. Your link is ready below.":res.where==="shared"?"Saved. Anyone with the link sees this version.":"Saved on this device. A live shared link needs the hosted version.";
   };
+  const cl=$("#copyLink");if(cl)cl.onclick=async()=>{try{await navigator.clipboard.writeText(shareUrl(S));$("#copyOut").textContent="Link copied."}catch(e){$("#shareUrl").select();$("#copyOut").textContent="Press Ctrl+C or long-press to copy."}};
   $("#copySum").onclick=async()=>{
     if(!S.savedAt){$("#copyOut").textContent="Calculate and save first.";return}
-    const lines=[`CalmSplit · ${S.name}`,`Total ${rs(S.savedTotal)} · ${S.members.length} people`,"",...(S.transfers.length?S.transfers.map(t=>`${nameOf(t.from)} → ${nameOf(t.to)}  ${rs(t.amt)}`):["Everyone's square."]),"","Open the dashboard link to check your entries."];
-    try{await navigator.clipboard.writeText(lines.join("\n"));$("#copyOut").textContent="Copied. Paste it in the group."}catch(e){$("#copyOut").textContent="Couldn't copy here. Select and copy from the settlement above."}
+    try{await navigator.clipboard.writeText(summaryText());$("#copyOut").textContent="Copied. Paste it in the group."}catch(e){$("#copyOut").textContent="Couldn't copy here. Select and copy from the settlement above."}
   };
 }
+if(HOSTED)document.querySelectorAll("a.mark").forEach(a=>a.setAttribute("href","/"));
+// refresh a shared split when the tab comes back, unless there are unsaved edits
+document.addEventListener("visibilitychange",async()=>{if(document.visibilityState!=="visible"||!HOSTED||!S||!S.remote||core(S)!==savedCore)return;const fresh=await loadSplit(S.id,true);if(fresh&&!fresh.__error&&fresh.version!==S.version){S=fresh;savedCore=core(S);render()}});
 route();
 })();
 </script>
