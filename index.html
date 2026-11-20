@@ -428,6 +428,15 @@ input[type=number]{-moz-appearance:textfield}
 .settle-hi .totals{align-items:baseline;margin-bottom:4px;opacity:1!important}
 .settle-hi .totals>span{opacity:.7}
 .save-row[hidden]{display:none}
+/* Clean white dashboard (day) */
+:root:not([data-mode="night"]) body.wide{--bg:#FFFFFF;--card:#FFFFFF;--line:#E7E9DF;--soft:#F2F4EC;background:#FFFFFF}
+:root:not([data-mode="night"]) body.wide input[type=text]{background:#F7F8F3;border-color:#ECEEE5}
+:root:not([data-mode="night"]) body.wide input[type=text]:focus{background:#FFFFFF;border-color:var(--moss)}
+:root:not([data-mode="night"]) body.wide .pcard,:root:not([data-mode="night"]) body.wide .rail .panel:not(.settle-hi){box-shadow:0 1px 2px rgba(31,45,19,.04),0 8px 24px -18px rgba(31,45,19,.25)}
+:root:not([data-mode="night"]) body.wide header.top{background:#FFFFFF;box-shadow:0 1px 2px rgba(31,45,19,.05)}
+.payers{grid-template-columns:repeat(auto-fill,minmax(min(100%,380px),450px))!important;gap:24px 28px!important;justify-content:start}
+.pcard{padding:16px 18px}
+.exp-row{grid-template-columns:1fr 88px auto auto auto;gap:6px}
 </style>
 </head>
 <body>
