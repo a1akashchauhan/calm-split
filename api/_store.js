@@ -32,6 +32,7 @@ function newId() {
 }
 
 const str = (v, max) => String(v == null ? "" : v).slice(0, max);
+const ts = (v) => { const n = Number(v); return Number.isFinite(n) && n > 0 && n < 1e14 ? Math.round(n) : 0; };
 const num = (v) => { const n = Number(v); return Number.isFinite(n) && n >= 0 && n < 1e9 ? Math.round(n * 100) / 100 : 0; };
 
 // Keep only the fields the app uses, with sane limits.
@@ -51,12 +52,12 @@ function clean(split) {
     flag: str(e && e.flag, 160),
     src: e && e.src ? { sender: str(e.src.sender, 60), time: str(e.src.time, 40), text: str(e.src.text, 600) } : null,
   }));
-  const history = (Array.isArray(split.history) ? split.history.slice(-30) : []).map((h) => ({ by: str(h && h.by, 40), at: num(h && h.at), what: str(h && h.what, 160) }));
+  const history = (Array.isArray(split.history) ? split.history.slice(-30) : []).map((h) => ({ by: str(h && h.by, 40), at: ts(h && h.at), what: str(h && h.what, 160) }));
   const transfers = (Array.isArray(split.transfers) ? split.transfers.slice(0, 200) : []).map((t) => ({ from: str(t && t.from, 40), to: str(t && t.to, 40), amt: num(t && t.amt) }));
   return {
     name: str(split.name, 80) || "Our trip",
     members: cleanMembers, expenses, history, transfers,
-    savedTotal: num(split.savedTotal), savedAt: num(split.savedAt), readBy: str(split.readBy, 40),
+    savedTotal: num(split.savedTotal), savedAt: ts(split.savedAt), readBy: str(split.readBy, 40),
   };
 }
 

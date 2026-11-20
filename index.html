@@ -890,7 +890,7 @@ async function saveSplit(s,force){
 async function loadSplit(id,remote){
   if(HOSTED&&remote){
     const r=await api("/api/splits/"+id,"GET");
-    if(r.status===200){const sp=r.data.split;sp.remote=true;sp.version=r.data.version;return sp}
+    if(r.status===200){const sp=r.data.split;sp.remote=true;sp.version=r.data.version;if(!sp.savedAt&&sp.updatedAt)sp.savedAt=sp.updatedAt;(sp.history||[]).forEach(h=>{if(!h.at)h.at=sp.updatedAt});return sp}
     if(r.status===404)return null;
     const cached=store.get("cs-split-"+id);if(cached)return cached;
     return {__error:r.data.error||"Couldn't reach the server."};
