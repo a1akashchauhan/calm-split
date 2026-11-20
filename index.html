@@ -437,6 +437,62 @@ input[type=number]{-moz-appearance:textfield}
 .payers{grid-template-columns:repeat(auto-fill,minmax(min(100%,380px),450px))!important;gap:24px 28px!important;justify-content:start}
 .pcard{padding:16px 18px}
 .exp-row{grid-template-columns:1fr 88px auto auto auto;gap:6px}
+
+/* ===== Ledger look ===== */
+.banner{position:relative;overflow:hidden;border-radius:24px;background:linear-gradient(120deg,color-mix(in srgb,var(--act) 22%,var(--card)) 0%,var(--card) 70%);border:1px solid var(--line);padding:20px 24px 18px;margin:4px 0 14px;min-height:150px}
+.banner-art{position:absolute;right:0;bottom:0;width:min(60%,520px);height:150px;pointer-events:none}
+.banner-in{position:relative;z-index:1}
+.banner .trip-name{font-size:34px!important;display:block;margin:2px 0 10px;width:min(100%,560px)}
+.stats{display:flex;gap:26px;flex-wrap:wrap}
+.stats div{display:flex;flex-direction:column}
+.stats b{font-family:var(--display);font-weight:500;font-size:24px;line-height:1.1}
+.stats span{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.stats .st-flag b{color:var(--warn)}
+:root[data-mode="night"] .rc-tot{color:color-mix(in srgb,var(--pc) 55%,var(--ink))}
+:root[data-mode="night"] .pcard.rcpt{border-top-color:color-mix(in srgb,var(--pc) 75%,var(--ink))!important}
+.av{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--pc);color:#fff;font-size:10px;font-weight:500;letter-spacing:.02em;flex:none}
+.av.lg{width:40px;height:40px;font-size:14px}
+.chip{background:color-mix(in srgb,var(--pc) 14%,var(--card))!important;color:var(--ink)!important;border:1px solid color-mix(in srgb,var(--pc) 35%,transparent);padding:3px 6px 3px 3px!important}
+.chip input{color:var(--ink)}
+.rcpt-wrap{filter:drop-shadow(0 1px 1px rgba(31,45,19,.06)) drop-shadow(0 10px 18px rgba(31,45,19,.08));padding-bottom:10px}
+.pcard.rcpt{position:relative;border:0!important;box-shadow:none!important;border-radius:16px 16px 0 0;border-top:5px solid var(--pc)!important;padding:16px 18px 12px;background:var(--card)}
+.pcard.rcpt::after{content:"";position:absolute;left:0;right:0;bottom:-9px;height:10px;background:linear-gradient(-45deg,transparent 7px,var(--card) 0) 0 0/14px 10px repeat-x,linear-gradient(45deg,transparent 7px,var(--card) 0) 0 0/14px 10px repeat-x}
+.rc-h{display:flex;align-items:center;gap:12px;padding-bottom:12px;border-bottom:1.5px dashed var(--line);margin-bottom:6px}
+.rc-who{flex:1;min-width:0}
+.rc-who b{display:block;font-weight:500;font-size:16px}
+.rc-who small{font-size:11px;color:var(--mute)}
+.rc-tot{font-family:var(--display);font-size:26px;font-weight:500;color:var(--pc)}
+.rc-lines .exp{border-top:0!important;padding:6px 0 8px!important}
+.ln{display:flex;align-items:baseline;gap:4px;position:relative}
+.ln input{background:transparent!important;border:0!important;border-bottom:1px solid transparent!important;border-radius:0!important;padding:4px 2px!important;font-size:14px;width:auto}
+.ln input:hover{border-bottom-color:var(--line)!important}
+.ln input:focus{border-bottom-color:var(--moss)!important;outline:none}
+.ln-t{min-width:5ch;max-width:60%}
+.dots{flex:1;border-bottom:2px dotted var(--line);transform:translateY(-4px);min-width:16px}
+.ln-r{color:var(--mute);font-size:14px}
+.ln-a{text-align:right;width:8ch!important;font-variant-numeric:tabular-nums;font-weight:500}
+.acts{display:inline-flex;gap:4px;align-self:center;margin-left:6px}
+.ico.sm{width:28px;height:28px;border-radius:7px;border-color:transparent;position:relative}
+.ico.sm svg{width:15px;height:15px}
+.ico.sm:hover{border-color:var(--line)}
+.ico.sm em{position:absolute;top:-7px;right:-9px;font-style:normal;font-size:9px;background:var(--act);color:var(--onact);border-radius:6px;padding:0 4px;line-height:14px}
+.ico.sm.open{height:36px;margin-bottom:-8px}
+@media (hover:hover){.exp .acts .del,.exp .acts [data-tg="src"]:not(.on){opacity:0;transition:opacity .15s}.exp:hover .acts .del,.exp:hover .acts [data-tg="src"],.exp:focus-within .acts .del,.exp:focus-within .acts [data-tg="src"]{opacity:1}}
+.rc-lines .exp-meta{margin:0 0 0 2px!important;font-size:11px}
+.add-exp{display:block;width:100%;margin-top:8px;background:transparent;border:0;border-top:1px dashed var(--line);padding:10px 0 2px;color:var(--moss);font-size:13px;text-align:left}
+.add-exp:hover{color:var(--ink)}
+.pay-who{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.settle-hi .av{box-shadow:0 0 0 2px var(--act)}
+.logbook{position:relative;background:repeating-linear-gradient(to bottom,transparent 0 27px,color-mix(in srgb,var(--line) 80%,transparent) 27px 28px),var(--card)!important;padding-left:30px!important}
+.logbook::before{content:"";position:absolute;left:18px;top:0;bottom:0;width:1.5px;background:color-mix(in srgb,#B5652F 45%,transparent)}
+.log-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.log-h h3{font-family:var(--display);font-weight:500;font-size:20px;margin:0}
+.log-h span{font-size:11px;color:var(--mute)}
+.log{list-style:none;margin:0;padding:0}
+.log li{display:grid;grid-template-columns:62px 1fr;gap:10px;padding:6px 0;font-size:12px;line-height:1.35}
+.log time{font-size:10px;color:var(--mute);text-transform:uppercase;letter-spacing:.04em}
+.log .hand{font-family:"Caveat",cursive;font-size:19px;color:var(--ink);line-height:1}
+.log small{display:block;color:var(--mute);font-size:11px}
 </style>
 </head>
 <body>
@@ -1047,6 +1103,14 @@ const icoDel='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-
 const open={people:new Set(),src:new Set()};
 const nameOf=id=>(S.members.find(m=>m.id===id)||{name:"?"}).name;
 
+function bannerArt(){
+  let seed=5;const r=()=>(seed=(seed*16807)%2147483647)/2147483647;
+  const ridge=(base,h,step,fill,op)=>{let d=`M0 150 L0 ${base}`;for(let x=0;x<=540;x+=step*(.7+r()*.6)){const th=h*(.6+r()*.7),y=base+Math.sin(x/60)*4;d+=` L${x-th*.28} ${y} L${x} ${y-th} L${x+th*.28} ${y}`}return `<path d="${d} L540 150Z" fill="${fill}" opacity="${op}"/>`};
+  return ridge(112,30,26,"var(--moss)",.18)+ridge(128,40,30,"var(--moss)",.32)+ridge(146,46,34,"var(--moss)",.55)+
+   `<g transform="translate(372 96)" stroke="var(--ink)" stroke-width="1.4" stroke-linejoin="round"><path d="M0 50 L26 6 L52 50Z" fill="var(--card)"/><path d="M26 6 L19 50 L33 50Z" fill="var(--ink)" opacity=".75"/></g>
+   <g transform="translate(440 128)"><path d="M-10 18 L10 12 M-10 12 L10 18" stroke="#6b4a2a" stroke-width="3" stroke-linecap="round"/><path class="flame" d="M0 12 C-7 5 -3 -2 -1 -8 C0 -1 5 0 4 6 C6 4 6 2 6 0 C9 6 7 11 0 12Z" fill="#E98B2E"/></g>
+   <circle cx="470" cy="34" r="16" fill="var(--act)" opacity=".55"/>`;
+}
 function render(){
   if(!S)return;
   const dirty=core(S)!==savedCore;
@@ -1057,12 +1121,20 @@ function render(){
   $("#dashBody").innerHTML=`
   <div class="dash">
    <div class="dash-main">
-    <div class="dash-head">
-      <div><span class="label">${S.readBy?"Filled in by "+esc(S.readBy)+" · check it":"Your split"}</span><br>
-        <input class="trip-name" id="tripName" value="${esc(S.name)}" aria-label="Split name"></div>
-      <div class="meta">${S.members.length} people · ${S.expenses.length} spends · ${rs(total)}${flags?` · <span class="flag">${flags} to check</span>`:""}</div>
+    <div class="banner">
+      <svg class="banner-art" viewBox="0 0 520 150" preserveAspectRatio="xMaxYMax meet" aria-hidden="true">${bannerArt()}</svg>
+      <div class="banner-in">
+        <span class="label">${S.readBy?"Trip ledger · filled in by "+esc(S.readBy)+", check it":"Trip ledger"}</span>
+        <input class="trip-name" id="tripName" value="${esc(S.name)}" aria-label="Split name">
+        <div class="stats">
+          <div><b>${rs(total)}</b><span>spent in all</span></div>
+          <div><b>${S.expenses.length}</b><span>spends</span></div>
+          <div><b>${S.members.length}</b><span>people</span></div>
+          ${flags?`<div class="st-flag"><b>${flags}</b><span>to check</span></div>`:""}
+        </div>
+      </div>
     </div>
-    <div class="members" id="members"><span class="label" style="margin-right:4px">Members</span>${S.members.map(m=>`<span class="chip"><input value="${esc(m.name)}" data-mid="${m.id}" aria-label="Member name"><button data-rm="${m.id}" aria-label="Remove ${esc(m.name)}">×</button></span>`).join("")}<button class="btn small" id="addMember">Add person</button></div>
+    <div class="members" id="members"><span class="label" style="margin-right:4px">Who's in</span>${S.members.map(m=>`<span class="chip" style="--pc:${colorOf(m.id)}">${av(m.id)}<input value="${esc(m.name)}" data-mid="${m.id}" aria-label="Member name"><button data-rm="${m.id}" aria-label="Remove ${esc(m.name)}">×</button></span>`).join("")}<button class="btn small" id="addMember">+ Add person</button></div>
     <p class="hint">Add anyone who never posted in the chat. Remove anyone who wasn't on the trip.</p>
     <div class="payers">${S.members.map(m=>payerCard(m,paid[m.id])).join("")}</div>
    </div>
@@ -1078,16 +1150,32 @@ function render(){
         ${shareHTML()}
         <div class="copy-out" id="copyOut" role="status"></div>
       </div>
-      ${S.history&&S.history.length?`<div class="panel"><span class="label">Changes</span><ul class="hist">${S.history.slice().reverse().slice(0,8).map(h=>`<li>${esc(h.by)} saved · ${new Date(h.at).toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"})}<br>${esc(h.what)}</li>`).join("")}</ul></div>`:""}
+      ${S.history&&S.history.length?`<div class="panel logbook"><div class="log-h"><h3>Log book</h3><span>${S.history.length} save${S.history.length>1?"s":""}</span></div><ol class="log">${S.history.slice().reverse().slice(0,8).map(h=>{const d=new Date(h.at);return `<li><time>${d.toLocaleDateString("en-IN",{day:"numeric",month:"short"})}<br>${d.toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit"})}</time><div><span class="hand">${esc(h.by)}</span> saved the ledger<small>${esc(h.what)}</small></div></li>`}).join("")}</ol></div>`:""}
    </div>
   </div>`;
   bind();
 }
+const PAL=["#5A6A31","#B5652F","#3E7CA6","#8A5A9E","#B8862B","#2F8A7A","#B04E5E","#6B7A8F"];
+function colorOf(id){const i=S.members.findIndex(m=>m.id===id);return PAL[(i<0?0:i)%PAL.length]}
+function initials(n){const p=String(n||"?").trim().split(/\s+/);return ((p[0]||"?")[0]+(p[1]?p[1][0]:(p[0][1]||""))).toUpperCase()}
+function initialsFor(id){
+  const used=new Map();
+  for(const m of S.members){
+    const nm=String(m.name||"?").trim(),parts=nm.split(/\s+/),w=parts[0]||"?";
+    const tries=[initials(nm),(w[0]+(w.at(-1)||"")).toUpperCase(),...[...w.slice(1)].map(c=>(w[0]+c).toUpperCase()),(w[0]+(used.size+1)).toUpperCase()];
+    const pick=tries.find(t=>![...used.values()].includes(t))||tries[0];used.set(m.id,pick);
+    if(m.id===id)return pick;
+  }
+  return initials(nameOf(id));
+}
+function av(id,cls){return `<span class="av ${cls||""}" style="--pc:${colorOf(id)}">${esc(initialsFor(id))}</span>`}
 function payerCard(m,amt){
   const list=S.expenses.filter(e=>e.payer===m.id);
-  return `<div class="pcard"><div class="pcard-h"><b>${esc(m.name)}</b><span>paid ${rs(amt)}</span></div>
-  ${list.map(e=>expRow(e)).join("")}
-  <button class="btn small add-exp" data-add="${m.id}">+ Add what ${esc(m.name)} paid for</button>${addHint===m.id?`<div class="add-hint" role="alert">Fill in what the last one was for and its amount first.</div>`:""}</div>`;
+  const n=list.filter(e=>e.amount>0).length;
+  return `<div class="rcpt-wrap"><div class="pcard rcpt" style="--pc:${colorOf(m.id)}">
+  <div class="rc-h">${av(m.id,"lg")}<div class="rc-who"><b>${esc(m.name)}</b><small>${n?`paid for ${n} thing${n>1?"s":""}`:"hasn't paid for anything yet"}</small></div><div class="rc-tot">${rs(amt)}</div></div>
+  <div class="rc-lines">${list.map(e=>expRow(e)).join("")}</div>
+  <button class="add-exp" data-add="${m.id}">+ Add what ${esc(m.name)} paid for</button>${addHint===m.id?`<div class="add-hint" role="alert">Fill in what the last one was for and its amount first.</div>`:""}</div></div>`;
 }
 const icoCheck='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
 let addHint=null;
@@ -1100,20 +1188,22 @@ function metaHTML(e){
 function expRow(e){
   const n=e.shares.length,total=S.members.length;
   const everyone=n===total&&S.members.every(m=>e.shares.includes(m.id));
-  const meta=metaHTML(e);
   const isOpen=open.people.has(e.id);
+  const tlen=Math.max(6,Math.min(26,(e.title||"").length+1));
   return `<div class="exp" data-eid="${e.id}">
-   <div class="exp-meta">${meta}</div>
-   <div class="exp-row">
-     <input type="text" value="${esc(e.title)}" data-f="title" placeholder="What for" aria-label="What for">
-     <span class="amt"><input type="text" inputmode="decimal" autocomplete="off" value="${fmtAmt(e.amount)}" placeholder="0" data-f="amount" aria-label="Amount in rupees"></span>
-     <div class="pop-wrap"><button class="ico ${isOpen?"open":(everyone?"":"part")}" data-tg="people" aria-expanded="${isOpen}" aria-label="Who shares this expense">${icoPeople}</button>
+   <div class="ln">
+     <input type="text" class="ln-t" size="${tlen}" value="${esc(e.title)}" data-f="title" placeholder="what for" aria-label="What for">
+     <span class="dots" aria-hidden="true"></span>
+     <span class="ln-r">₹</span><input type="text" class="ln-a" inputmode="decimal" autocomplete="off" value="${fmtAmt(e.amount)}" placeholder="0" data-f="amount" aria-label="Amount in rupees">
+     <span class="acts">
+     <span class="pop-wrap"><button class="ico sm ${isOpen?"open":(everyone?"":"part")}" data-tg="people" aria-expanded="${isOpen}" aria-label="Who shares this expense">${icoPeople}${everyone?"":`<em>${n}/${total}</em>`}</button>
      ${isOpen?`<div class="pop" role="dialog" aria-label="Who shares this expense"><div class="pop-h">Who shares this expense?</div>
        <button class="chk all ${everyone?"on":""}" data-all="1"><span class="box">${icoCheck}</span>Everyone</button>
-       ${S.members.map(m=>`<button class="chk ${e.shares.includes(m.id)?"on":""}" data-tick="${m.id}"><span class="box">${icoCheck}</span>${esc(m.name)}</button>`).join("")}</div>`:""}</div>
-     ${e.src?`<button class="ico ${open.src.has(e.id)?"on":""}" data-tg="src" aria-label="Show the chat message">${icoMsg}</button>`:`<span></span>`}
-     <button class="ico del" data-del="1" aria-label="Delete this spend">${icoDel}</button>
+       ${S.members.map(m=>`<button class="chk ${e.shares.includes(m.id)?"on":""}" data-tick="${m.id}"><span class="box">${icoCheck}</span>${esc(m.name)}</button>`).join("")}</div>`:""}</span>
+     ${e.src?`<button class="ico sm ${open.src.has(e.id)?"on":""}" data-tg="src" aria-label="Show the chat message">${icoMsg}</button>`:""}
+     <button class="ico sm del" data-del="1" aria-label="Delete this spend">${icoDel}</button></span>
    </div>
+   <div class="exp-meta">${metaHTML(e)}</div>
    ${open.src.has(e.id)&&e.src?`<div class="src">${esc(e.src.sender)} · ${esc(e.src.time)}\n${esc(e.src.text)}</div>`:""}
   </div>`;
 }
@@ -1133,7 +1223,7 @@ function shareHTML(){
 function settleHTML(){
   if(!S.savedAt)return `<h3 class="settle-title">Who pays whom</h3><p class="empty">Check the spends, then press Calculate and save.</p>`;
   const t=S.transfers||[];
-  return `<div class="totals"><h3 class="settle-title">Who pays whom</h3><span>Total ${rs(S.savedTotal||0)}</span></div>`+(t.length?t.map(x=>`<div class="pay"><span><span class="nm">${esc(nameOf(x.from))}</span><span class="pays">pays</span><span class="nm">${esc(nameOf(x.to))}</span></span><span class="amt" data-count="${x.amt}">${rs(x.amt)}</span></div>`).join(""):`<p class="empty">Everyone's square.</p>`);
+  return `<div class="totals"><h3 class="settle-title">Who pays whom</h3><span>Total ${rs(S.savedTotal||0)}</span></div>`+(t.length?t.map(x=>`<div class="pay"><span class="pay-who">${av(x.from)}<span class="nm">${esc(nameOf(x.from))}</span><span class="pays">pays</span>${av(x.to)}<span class="nm">${esc(nameOf(x.to))}</span></span><span class="amt" data-count="${x.amt}">${rs(x.amt)}</span></div>`).join(""):`<p class="empty">Everyone's square.</p>`);
 }
 function animateSettle(){
   const el=$("#settle");if(!el)return;
@@ -1174,11 +1264,11 @@ function bind(){
     const e=S.expenses.find(x=>x.id===row.dataset.eid);
     row.querySelectorAll("[data-f]").forEach(inp=>{inp.oninput=()=>{
       if(inp.dataset.f==="amount"){let v=inp.value.replace(/[^\d.]/g,"").replace(/(\..*)\./g,"$1");const m=v.match(/^\d*(\.\d{0,2})?/);v=m?m[0]:"";if(v!==inp.value)inp.value=v;e.amount=parseFloat(v)||0}
-      else e.title=inp.value;
+      else{e.title=inp.value;inp.size=Math.max(6,Math.min(26,inp.value.length+1))}
       if(inp.dataset.f==="amount"&&e.flag)e.flag="";
       if(addHint===e.payer&&String(e.title).trim()&&e.amount>0){addHint=null;const h=row.closest(".pcard").querySelector(".add-hint");h&&h.remove()}
       row.querySelector(".exp-meta").innerHTML=metaHTML(e);
-      const tot=S.expenses.filter(x=>x.payer===e.payer).reduce((a,x)=>a+(+x.amount||0),0);row.closest(".pcard").querySelector(".pcard-h span").textContent="paid "+rs(tot);
+      const tot=S.expenses.filter(x=>x.payer===e.payer).reduce((a,x)=>a+(+x.amount||0),0);row.closest(".pcard").querySelector(".rc-tot").textContent=rs(tot);
       setDirty()}});
     row.querySelectorAll("[data-tg]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();const k=b.dataset.tg,s=open[k];const was=s.has(e.id);if(k==="people")s.clear();was?s.delete(e.id):s.add(e.id);render()});
     const all=row.querySelector("[data-all]");if(all)all.onclick=ev=>{ev.stopPropagation();const everyone=e.shares.length===S.members.length;e.shares=everyone?[]:S.members.map(m=>m.id);e.flag="";render()};
