@@ -571,7 +571,7 @@ const sun='<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1
 const moon='<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>';
 function setMode(m){document.documentElement.dataset.mode=m;if(window.__scene)window.__scene.paint();$("#modeIco").innerHTML=m==="night"?sun:moon;$("#modeTxt").textContent=m==="night"?"Day":"Night";store.set("cs-mode",m)}
 const hostDark=document.documentElement.dataset.theme==="dark"||(!document.documentElement.dataset.theme&&matchMedia("(prefers-color-scheme: dark)").matches);
-setMode(store.get("cs-mode")||(hostDark?"night":"day"));
+setMode(store.get("cs-mode")||"day");
 $("#modeBtn").onclick=()=>setMode(document.documentElement.dataset.mode==="night"?"day":"night");
 
 /* ---------- Fireflies ---------- */
