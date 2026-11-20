@@ -17,7 +17,7 @@ No sign-up, no app download.
 | Message | How it's read |
 | --- | --- |
 | `petrol 2770` | Sender paid, everyone shares |
-| `cafe 1260 @prakriti` | Sender and Prakriti share |
+| `cafe 1260 @shreyash` | Sender and Shreyash share |
 | `drinks 1000 paid by Shreyash` | Shreyash paid, everyone shares |
 | `dinner 2400 no rohit` | Rohit left out |
 | `paragliding 1500 each` | 1500 × people sharing, flagged for a check |

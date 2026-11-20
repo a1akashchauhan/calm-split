@@ -643,21 +643,21 @@ function settle(members,expenses){
 
 /* ---------- How it works tiles ---------- */
 (function(){
-  const M=["Akash","Aman","Prakriti","Rohit","Yash"].map(n=>({id:n,name:n}));
+  const M=["Akash","Aman","Shreyash","Rohit","Yash"].map(n=>({id:n,name:n}));
   const all=M.map(m=>m.id);
   const E=[
     {payer:"Aman",title:"petrol",amount:2770,shares:all},
-    {payer:"Prakriti",title:"dinner",amount:2400,shares:all.filter(x=>x!=="Rohit")},
+    {payer:"Shreyash",title:"dinner",amount:2400,shares:all.filter(x=>x!=="Rohit")},
     {payer:"Akash",title:"transfer to Aman",amount:500,shares:["Aman"]},
-    {payer:"Yash",title:"cafe",amount:1260,shares:["Prakriti","Yash"]},
+    {payer:"Yash",title:"cafe",amount:1260,shares:["Shreyash","Yash"]},
     {payer:"Rohit",title:"maggi",amount:340,shares:all}];
   const s=settle(M,E);
-  $("#t1").innerHTML=`<div class="wa"><div class="wa-top"><i>K</i><div>Kasol trip<small>Akash, Aman, Prakriti, Rohit, Yash</small></div></div>
+  $("#t1").innerHTML=`<div class="wa"><div class="wa-top"><i>K</i><div>Kasol trip<small>Akash, Aman, Shreyash, Rohit, Yash</small></div></div>
    <div class="wa-body"><span class="wa-day">Today</span>
    <div class="wab"><small>Aman</small>petrol 2770<time>9:41</time></div>
-   <div class="wab"><small>Prakriti</small>dinner 2400 no rohit<time>21:10</time></div>
+   <div class="wab"><small>Shreyash</small>dinner 2400 no rohit<time>21:10</time></div>
    <div class="wab me">sent 500 to aman<time>21:32</time></div>
-   <div class="wab"><small>Yash</small>cafe 1260 @prakriti<time>16:05</time></div>
+   <div class="wab"><small>Yash</small>cafe 1260 @shreyash<time>16:05</time></div>
    <div class="wab"><small>Rohit</small>maggi 340, sabka<time>23:48</time></div>
    <div class="wab me">who's doing the hisaab? 😅<time>23:50</time></div></div>
    <div class="wa-in">Message</div></div>`;
@@ -843,12 +843,12 @@ ${list.join("\n")}`;
 /* ---------- Example trip ---------- */
 const EXAMPLE=`12/03/26, 7:02 am - Akash: Leaving at 7:30, everyone ready?
 12/03/26, 9:41 am - Yash: petrol 2770
-12/03/26, 1:15 pm - Prakriti: lunch at the dhaba 1840
+12/03/26, 1:15 pm - Shreyash: lunch at the dhaba 1840
 12/03/26, 6:30 pm - Shambhavi: I won't come for dinner, too tired
 12/03/26, 9:10 pm - Akash: dinner 2400 no shambhavi
 12/03/26, 9:12 pm - Akash: homestay 9000 for 2 nights
 13/03/26, 10:05 am - Yash: tip 1000
-13/03/26, 12:20 pm - Prakriti: paragliding 1500 each @akash @prakriti
+13/03/26, 12:20 pm - Shreyash: paragliding 1500 each @akash @shreyash
 13/03/26, 4:45 pm - Shambhavi: pizza 800
 13/03/26, 5:00 pm - Akash: sent 500 to yash
 13/03/26, 8:30 pm - Yash: other stuff 2666
