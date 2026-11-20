@@ -429,7 +429,7 @@ input[type=number]{-moz-appearance:textfield}
 .settle-hi .totals>span{opacity:.7}
 .save-row[hidden]{display:none}
 /* Clean white dashboard (day) */
-:root:not([data-mode="night"]) body.wide{--bg:#FFFFFF;--card:#FFFFFF;--line:#E7E9DF;--soft:#F2F4EC;background:#FFFFFF}
+:root:not([data-mode="night"]) body.wide{--bg:#FFFFFF;--card:#FFFFFF;--line:#E7E9DF;--soft:#F2F4EC;background:radial-gradient(900px 520px at -5% -10%,rgba(185,194,85,.20),transparent 62%),radial-gradient(800px 620px at 105% 20%,rgba(169,224,241,.22),transparent 60%),radial-gradient(900px 600px at 40% 115%,rgba(233,190,140,.16),transparent 60%),#FBFCF8;background-attachment:fixed}
 :root:not([data-mode="night"]) body.wide input[type=text]{background:#F7F8F3;border-color:#ECEEE5}
 :root:not([data-mode="night"]) body.wide input[type=text]:focus{background:#FFFFFF;border-color:var(--moss)}
 :root:not([data-mode="night"]) body.wide .pcard,:root:not([data-mode="night"]) body.wide .rail .panel:not(.settle-hi){box-shadow:0 1px 2px rgba(31,45,19,.04),0 8px 24px -18px rgba(31,45,19,.25)}
@@ -440,7 +440,7 @@ input[type=number]{-moz-appearance:textfield}
 
 /* ===== Ledger look ===== */
 .banner{position:relative;overflow:hidden;border-radius:24px;background:linear-gradient(120deg,color-mix(in srgb,var(--act) 22%,var(--card)) 0%,var(--card) 70%);border:1px solid var(--line);padding:20px 24px 18px;margin:4px 0 14px;min-height:150px}
-.banner-art{position:absolute;right:0;bottom:0;width:min(60%,520px);height:150px;pointer-events:none}
+.banner-art{position:absolute;right:0;bottom:0;width:min(62%,560px);height:160px;pointer-events:none}
 .banner-in{position:relative;z-index:1}
 .banner .trip-name{font-size:34px!important;display:block;margin:2px 0 10px;width:min(100%,560px)}
 .stats{display:flex;gap:26px;flex-wrap:wrap}
@@ -466,6 +466,7 @@ input[type=number]{-moz-appearance:textfield}
 .ln{display:flex;align-items:baseline;gap:4px;position:relative}
 .ln input{background:transparent!important;border:0!important;border-bottom:1px solid transparent!important;border-radius:0!important;padding:4px 2px!important;font-size:14px;width:auto}
 .ln input:hover{border-bottom-color:var(--line)!important}
+.ln input::placeholder{color:color-mix(in srgb,var(--mute) 70%,transparent);font-style:italic}
 .ln input:focus{border-bottom-color:var(--moss)!important;outline:none}
 .ln-t{min-width:5ch;max-width:60%}
 .dots{flex:1;border-bottom:2px dotted var(--line);transform:translateY(-4px);min-width:16px}
@@ -1104,12 +1105,14 @@ const open={people:new Set(),src:new Set()};
 const nameOf=id=>(S.members.find(m=>m.id===id)||{name:"?"}).name;
 
 function bannerArt(){
-  let seed=5;const r=()=>(seed=(seed*16807)%2147483647)/2147483647;
-  const ridge=(base,h,step,fill,op)=>{let d=`M0 150 L0 ${base}`;for(let x=0;x<=540;x+=step*(.7+r()*.6)){const th=h*(.6+r()*.7),y=base+Math.sin(x/60)*4;d+=` L${x-th*.28} ${y} L${x} ${y-th} L${x+th*.28} ${y}`}return `<path d="${d} L540 150Z" fill="${fill}" opacity="${op}"/>`};
-  return ridge(112,30,26,"var(--moss)",.18)+ridge(128,40,30,"var(--moss)",.32)+ridge(146,46,34,"var(--moss)",.55)+
-   `<g transform="translate(372 96)" stroke="var(--ink)" stroke-width="1.4" stroke-linejoin="round"><path d="M0 50 L26 6 L52 50Z" fill="var(--card)"/><path d="M26 6 L19 50 L33 50Z" fill="var(--ink)" opacity=".75"/></g>
-   <g transform="translate(440 128)"><path d="M-10 18 L10 12 M-10 12 L10 18" stroke="#6b4a2a" stroke-width="3" stroke-linecap="round"/><path class="flame" d="M0 12 C-7 5 -3 -2 -1 -8 C0 -1 5 0 4 6 C6 4 6 2 6 0 C9 6 7 11 0 12Z" fill="#E98B2E"/></g>
-   <circle cx="470" cy="34" r="16" fill="var(--act)" opacity=".55"/>`;
+  return `<defs><linearGradient id="mtA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="color-mix(in srgb,var(--moss) 42%,var(--card))"/><stop offset="1" stop-color="color-mix(in srgb,var(--moss) 22%,var(--card))"/></linearGradient>
+   <linearGradient id="mtB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="color-mix(in srgb,var(--moss) 68%,var(--card))"/><stop offset="1" stop-color="color-mix(in srgb,var(--moss) 45%,var(--card))"/></linearGradient>
+   <radialGradient id="sunG"><stop offset="0" stop-color="var(--act)" stop-opacity=".85"/><stop offset=".7" stop-color="var(--act)" stop-opacity=".55"/><stop offset="1" stop-color="var(--act)" stop-opacity="0"/></radialGradient></defs>
+   <circle cx="366" cy="66" r="80" fill="url(#sunG)" opacity=".45"/><circle cx="366" cy="66" r="42" fill="var(--act)" opacity=".8"/>
+   <path d="M120 150 L282 34 Q296 25 310 34 L470 150Z" fill="url(#mtA)"/>
+   <path d="M282 34 Q296 25 310 34 L326 46 L312 42 L300 50 L288 42 L272 48Z" fill="#fff" opacity=".7"/>
+   <path d="M300 150 L430 62 Q442 55 454 62 L560 150Z" fill="url(#mtB)"/>
+   <path d="M60 150 C190 118 330 116 560 132 L560 150Z" fill="color-mix(in srgb,var(--moss) 80%,var(--card))"/>`;
 }
 function render(){
   if(!S)return;
@@ -1124,7 +1127,7 @@ function render(){
     <div class="banner">
       <svg class="banner-art" viewBox="0 0 520 150" preserveAspectRatio="xMaxYMax meet" aria-hidden="true">${bannerArt()}</svg>
       <div class="banner-in">
-        <span class="label">${S.readBy?"Trip ledger · filled in by "+esc(S.readBy)+", check it":"Trip ledger"}</span>
+        <span class="label">${S.readBy?"Trip summary · filled in by "+esc(S.readBy)+", check it":"Trip summary"}</span>
         <input class="trip-name" id="tripName" value="${esc(S.name)}" aria-label="Split name">
         <div class="stats">
           <div><b>${rs(total)}</b><span>spent in all</span></div>
@@ -1150,7 +1153,7 @@ function render(){
         ${shareHTML()}
         <div class="copy-out" id="copyOut" role="status"></div>
       </div>
-      ${S.history&&S.history.length?`<div class="panel logbook"><div class="log-h"><h3>Log book</h3><span>${S.history.length} save${S.history.length>1?"s":""}</span></div><ol class="log">${S.history.slice().reverse().slice(0,8).map(h=>{const d=new Date(h.at);return `<li><time>${d.toLocaleDateString("en-IN",{day:"numeric",month:"short"})}<br>${d.toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit"})}</time><div><span class="hand">${esc(h.by)}</span> saved the ledger<small>${esc(h.what)}</small></div></li>`}).join("")}</ol></div>`:""}
+      ${S.history&&S.history.length?`<div class="panel logbook"><div class="log-h"><h3>Log book</h3><span>${S.history.length} save${S.history.length>1?"s":""}</span></div><ol class="log">${S.history.slice().reverse().slice(0,8).map(h=>{const d=new Date(h.at);return `<li><time>${d.toLocaleDateString("en-IN",{day:"numeric",month:"short"})}<br>${d.toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit"})}</time><div><span class="hand">${esc(h.by)}</span> saved the summary<small>${esc(h.what)}</small></div></li>`}).join("")}</ol></div>`:""}
    </div>
   </div>`;
   bind();
@@ -1189,7 +1192,7 @@ function expRow(e){
   const n=e.shares.length,total=S.members.length;
   const everyone=n===total&&S.members.every(m=>e.shares.includes(m.id));
   const isOpen=open.people.has(e.id);
-  const tlen=Math.max(6,Math.min(26,(e.title||"").length+1));
+  const tlen=Math.max(9,Math.min(26,(e.title||"").length+1));
   return `<div class="exp" data-eid="${e.id}">
    <div class="ln">
      <input type="text" class="ln-t" size="${tlen}" value="${esc(e.title)}" data-f="title" placeholder="what for" aria-label="What for">
@@ -1264,7 +1267,7 @@ function bind(){
     const e=S.expenses.find(x=>x.id===row.dataset.eid);
     row.querySelectorAll("[data-f]").forEach(inp=>{inp.oninput=()=>{
       if(inp.dataset.f==="amount"){let v=inp.value.replace(/[^\d.]/g,"").replace(/(\..*)\./g,"$1");const m=v.match(/^\d*(\.\d{0,2})?/);v=m?m[0]:"";if(v!==inp.value)inp.value=v;e.amount=parseFloat(v)||0}
-      else{e.title=inp.value;inp.size=Math.max(6,Math.min(26,inp.value.length+1))}
+      else{e.title=inp.value;inp.size=Math.max(9,Math.min(26,inp.value.length+1))}
       if(inp.dataset.f==="amount"&&e.flag)e.flag="";
       if(addHint===e.payer&&String(e.title).trim()&&e.amount>0){addHint=null;const h=row.closest(".pcard").querySelector(".add-hint");h&&h.remove()}
       row.querySelector(".exp-meta").innerHTML=metaHTML(e);
@@ -1293,7 +1296,7 @@ function bind(){
     $("#saveNote").textContent=res.where==="created"?"Saved. Your link is ready below.":res.where==="shared"?"Saved. Anyone with the link sees this version.":"Saved on this device. A live shared link needs the hosted version.";
   };
   const cl=$("#copyLink");if(cl)cl.onclick=async()=>{try{await navigator.clipboard.writeText(shareUrl(S));$("#copyOut").textContent="Link copied."}catch(e){$("#shareUrl").select();$("#copyOut").textContent="Press Ctrl+C or long-press to copy."}};
-  $("#copySum").onclick=async()=>{
+  const csb=$("#copySum");if(csb)csb.onclick=async()=>{
     if(!S.savedAt){$("#copyOut").textContent="Calculate and save first.";return}
     try{await navigator.clipboard.writeText(summaryText());$("#copyOut").textContent="Copied. Paste it in the group."}catch(e){$("#copyOut").textContent="Couldn't copy here. Select and copy from the settlement above."}
   };
