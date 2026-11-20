@@ -494,6 +494,28 @@ input[type=number]{-moz-appearance:textfield}
 .log time{font-size:10px;color:var(--mute);text-transform:uppercase;letter-spacing:.04em}
 .log .hand{font-family:"Caveat",cursive;font-size:19px;color:var(--ink);line-height:1}
 .log small{display:block;color:var(--mute);font-size:11px}
+
+.amt-pill{display:inline-flex;align-items:center;gap:2px;background:var(--soft);border:1px solid var(--line);border-radius:9px;padding:0 8px 0 9px;height:32px;cursor:text;flex:none}
+.amt-pill span{color:var(--mute);font-size:13px}
+.amt-pill .ln-a{width:7ch!important;text-align:left!important;padding:4px 0!important;border:0!important;font-size:15px}
+.amt-pill:focus-within{border-color:var(--moss);background:var(--card);box-shadow:0 0 0 3px color-mix(in srgb,var(--act) 30%,transparent)}
+.amt-pill.empty{border-style:dashed;border-color:color-mix(in srgb,var(--moss) 55%,transparent)}
+.amt-pill .ln-a::placeholder{font-style:italic;font-weight:400}
+.ln{align-items:center!important}
+.dots{transform:translateY(3px)!important}
+.who-btn{display:inline-flex;align-items:center;justify-content:center;min-width:108px;gap:5px;height:32px;padding:0 9px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:12px;color:var(--ink);white-space:nowrap}
+.who-btn svg{width:15px;height:15px}
+.who-btn i{font-style:normal;font-size:9px;opacity:.6}
+.who-btn:hover{border-color:var(--moss)}
+.who-btn.part{background:var(--act);border-color:var(--act);color:var(--onact);font-weight:500}
+.who-btn.open{border-color:var(--moss);box-shadow:0 0 0 3px color-mix(in srgb,var(--act) 35%,transparent)}
+.who-btn+.pop,.pop-wrap .pop{top:calc(100% + 6px)!important;border-radius:12px!important}
+.ln-t{flex:1 1 0;width:0!important;min-width:6ch;max-width:none!important}
+.dots{flex:0 0 18px!important;min-width:0!important}
+.exp-sub{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:22px}
+.exp-sub .acts{margin-left:auto}
+.exp-sub .ico.sm{width:24px;height:24px}
+.exp-sub .ico.sm svg{width:13px;height:13px}
 </style>
 </head>
 <body>
@@ -1186,7 +1208,7 @@ function fmtAmt(n){return n?String(+(+n).toFixed(2)):""}
 function metaHTML(e){
   const n=e.shares.length,total=S.members.length,everyone=n===total;
   const each=n?rs(e.amount/n)+" each":"nobody ticked";
-  return (everyone?`Shared by everyone · ${each}`:`<span class="part">Not everyone</span> ${n} of ${total} · ${each}`)+(e.flag?` <span class="flag">${esc(e.flag)}</span>`:"");
+  return (!(e.amount>0)?"":n?each:`<span class="part">Tick who shares this</span>`)+(e.flag?` <span class="flag">${esc(e.flag)}</span>`:"");
 }
 function expRow(e){
   const n=e.shares.length,total=S.members.length;
@@ -1197,16 +1219,17 @@ function expRow(e){
    <div class="ln">
      <input type="text" class="ln-t" size="${tlen}" value="${esc(e.title)}" data-f="title" placeholder="what for" aria-label="What for">
      <span class="dots" aria-hidden="true"></span>
-     <span class="ln-r">₹</span><input type="text" class="ln-a" inputmode="decimal" autocomplete="off" value="${fmtAmt(e.amount)}" placeholder="0" data-f="amount" aria-label="Amount in rupees">
+     <label class="amt-pill ${e.amount>0?"":"empty"}"><span>₹</span><input type="text" class="ln-a" inputmode="decimal" autocomplete="off" value="${fmtAmt(e.amount)}" placeholder="amount" data-f="amount" aria-label="Amount in rupees"></label>
      <span class="acts">
-     <span class="pop-wrap"><button class="ico sm ${isOpen?"open":(everyone?"":"part")}" data-tg="people" aria-expanded="${isOpen}" aria-label="Who shares this expense">${icoPeople}${everyone?"":`<em>${n}/${total}</em>`}</button>
+     <span class="pop-wrap"><button class="who-btn ${isOpen?"open":""} ${everyone?"":"part"}" data-tg="people" aria-expanded="${isOpen}" aria-label="Who shares this expense: ${everyone?"everyone":n+" of "+total}">${icoPeople}<span>${everyone?"Everyone":n+" of "+total}</span><i aria-hidden="true">▾</i></button>
      ${isOpen?`<div class="pop" role="dialog" aria-label="Who shares this expense"><div class="pop-h">Who shares this expense?</div>
        <button class="chk all ${everyone?"on":""}" data-all="1"><span class="box">${icoCheck}</span>Everyone</button>
        ${S.members.map(m=>`<button class="chk ${e.shares.includes(m.id)?"on":""}" data-tick="${m.id}"><span class="box">${icoCheck}</span>${esc(m.name)}</button>`).join("")}</div>`:""}</span>
-     ${e.src?`<button class="ico sm ${open.src.has(e.id)?"on":""}" data-tg="src" aria-label="Show the chat message">${icoMsg}</button>`:""}
-     <button class="ico sm del" data-del="1" aria-label="Delete this spend">${icoDel}</button></span>
+</span>
    </div>
-   <div class="exp-meta">${metaHTML(e)}</div>
+   <div class="exp-sub"><div class="exp-meta">${metaHTML(e)}</div><span class="acts">
+     ${e.src?`<button class="ico sm ${open.src.has(e.id)?"on":""}" data-tg="src" aria-label="Show the chat message">${icoMsg}</button>`:""}
+     <button class="ico sm del" data-del="1" aria-label="Delete this spend">${icoDel}</button></span></div>
    ${open.src.has(e.id)&&e.src?`<div class="src">${esc(e.src.sender)} · ${esc(e.src.time)}\n${esc(e.src.text)}</div>`:""}
   </div>`;
 }
@@ -1266,7 +1289,7 @@ function bind(){
   document.querySelectorAll(".exp").forEach(row=>{
     const e=S.expenses.find(x=>x.id===row.dataset.eid);
     row.querySelectorAll("[data-f]").forEach(inp=>{inp.oninput=()=>{
-      if(inp.dataset.f==="amount"){let v=inp.value.replace(/[^\d.]/g,"").replace(/(\..*)\./g,"$1");const m=v.match(/^\d*(\.\d{0,2})?/);v=m?m[0]:"";if(v!==inp.value)inp.value=v;e.amount=parseFloat(v)||0}
+      if(inp.dataset.f==="amount"){let v=inp.value.replace(/[^\d.]/g,"").replace(/(\..*)\./g,"$1");const m=v.match(/^\d*(\.\d{0,2})?/);v=m?m[0]:"";if(v!==inp.value)inp.value=v;e.amount=parseFloat(v)||0;inp.closest(".amt-pill").classList.toggle("empty",!(e.amount>0))}
       else{e.title=inp.value;inp.size=Math.max(9,Math.min(26,inp.value.length+1))}
       if(inp.dataset.f==="amount"&&e.flag)e.flag="";
       if(addHint===e.payer&&String(e.title).trim()&&e.amount>0){addHint=null;const h=row.closest(".pcard").querySelector(".add-hint");h&&h.remove()}
