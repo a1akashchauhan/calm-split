@@ -424,6 +424,10 @@ input[type=number]{-moz-appearance:textfield}
 .rail .err-msg{min-height:0}
 .settle-hi .pay{padding:7px 0!important}
 @media (max-width:980px){.dash{grid-template-columns:1fr!important}.rail{position:static}}
+.settle-title{font-family:var(--display);font-weight:500;font-size:24px;margin:0;color:var(--onact);letter-spacing:-.01em}
+.settle-hi .totals{align-items:baseline;margin-bottom:4px;opacity:1!important}
+.settle-hi .totals>span{opacity:.7}
+.save-row[hidden]{display:none}
 </style>
 </head>
 <body>
@@ -1055,8 +1059,8 @@ function render(){
    </div>
    <div class="rail">
       <div class="panel">
-        <div class="save-note ${dirty?"":"ok"}" id="saveNote">${dirty?"Unsaved changes. Calculate and save to update the link.":(S.savedAt?"Saved "+new Date(S.savedAt).toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"}):"")}</div>
-        <div class="save-row"><input type="text" id="meIn" value="${esc(me)}" placeholder="Your name" aria-label="Editing as"><button class="btn primary" id="saveBtn">Calculate and save</button></div>
+        <div class="save-note ${dirty?"":"ok"}" id="saveNote">${saveNoteText(dirty)}</div>
+        <div class="save-row" id="saveRow" ${dirty||!S.savedAt?"":"hidden"}><input type="text" id="meIn" value="${esc(me)}" placeholder="Your name" aria-label="Editing as"><button class="btn primary" id="saveBtn">Calculate and save</button></div>
         <div class="err-msg" id="saveErr" role="alert"></div>
       </div>
       <div class="panel settle settle-hi" id="settle">${settleHTML()}</div>
@@ -1118,9 +1122,9 @@ function shareHTML(){
    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><a class="btn small wa-btn" href="${esc(wa)}" target="_blank" rel="noopener">Send on WhatsApp</a><button class="btn small" id="copySum">Copy summary</button></div>`;
 }
 function settleHTML(){
-  if(!S.savedAt)return `<span class="label">Who pays whom</span><p class="empty">Check the spends, then press Calculate and save.</p>`;
+  if(!S.savedAt)return `<h3 class="settle-title">Who pays whom</h3><p class="empty">Check the spends, then press Calculate and save.</p>`;
   const t=S.transfers||[];
-  return `<div class="totals"><span class="label">Who pays whom</span><span>${rs(S.savedTotal||0)}</span></div>`+(t.length?t.map(x=>`<div class="pay"><span><span class="nm">${esc(nameOf(x.from))}</span><span class="pays">pays</span><span class="nm">${esc(nameOf(x.to))}</span></span><span class="amt" data-count="${x.amt}">${rs(x.amt)}</span></div>`).join(""):`<p class="empty">Everyone's square.</p>`);
+  return `<div class="totals"><h3 class="settle-title">Who pays whom</h3><span>Total ${rs(S.savedTotal||0)}</span></div>`+(t.length?t.map(x=>`<div class="pay"><span><span class="nm">${esc(nameOf(x.from))}</span><span class="pays">pays</span><span class="nm">${esc(nameOf(x.to))}</span></span><span class="amt" data-count="${x.amt}">${rs(x.amt)}</span></div>`).join(""):`<p class="empty">Everyone's square.</p>`);
 }
 function animateSettle(){
   const el=$("#settle");if(!el)return;
@@ -1129,7 +1133,13 @@ function animateSettle(){
   el.querySelectorAll("[data-count]").forEach(n=>{const target=+n.dataset.count;const t0=performance.now();
     (function tick(t){const p=Math.min(1,(t-t0)/900);n.textContent=rs(target*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(tick)})(t0)});
 }
-function setDirty(){const d=core(S)!==savedCore;const n=$("#saveNote");if(n){n.className="save-note "+(d?"":"ok");n.textContent=d?"Unsaved changes. Press Calculate and save to update the link.":""}}
+function saveNoteText(d){
+  if(d&&S.savedAt)return "Unsaved changes. Calculate and save to update the link.";
+  if(!S.savedAt)return "Check the spends, then calculate and save.";
+  const last=(S.history||[]).slice(-1)[0];
+  return "Saved "+new Date(S.savedAt).toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"})+(last&&last.by?" by "+esc(last.by):"")+". Edit anything to change it.";
+}
+function setDirty(){const d=core(S)!==savedCore;const n=$("#saveNote");if(n){n.className="save-note "+(d?"":"ok");n.innerHTML=saveNoteText(d)}const r=$("#saveRow");if(r)r.hidden=!(d||!S.savedAt)}
 document.addEventListener("click",ev=>{if(open.people.size&&!ev.target.closest(".pop-wrap")){open.people.clear();render()}});
 document.addEventListener("keydown",ev=>{if(ev.key==="Escape"&&open.people.size){open.people.clear();render()}});
 function showConflict(c){
