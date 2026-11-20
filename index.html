@@ -404,6 +404,26 @@ input[type=number]{-moz-appearance:textfield}
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
 }
+
+/* Wide dashboard */
+.wide .wrap{max-width:1440px}
+.wide header.top{margin-bottom:8px}
+.dash{grid-template-columns:minmax(0,1fr) 400px!important;gap:24px!important;margin-top:4px}
+.dash-main{min-width:0}
+.dash-head{margin:4px 0 10px!important}
+.trip-name{font-size:28px!important}
+.members{margin-bottom:2px}
+.hint{margin:4px 0 14px!important}
+.payers{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(min(100%,430px),1fr));gap:14px!important;align-items:start}
+.rail{gap:12px!important}
+.rail .panel{padding:14px 18px}
+.save-row{display:flex;gap:8px}
+.save-row input{flex:1;min-width:0}
+.save-row .btn,.linkbox .btn{white-space:nowrap;padding:10px 14px}
+.save-note{margin-bottom:8px!important}
+.rail .err-msg{min-height:0}
+.settle-hi .pay{padding:7px 0!important}
+@media (max-width:980px){.dash{grid-template-columns:1fr!important}.rail{position:static}}
 </style>
 </head>
 <body>
@@ -909,7 +929,7 @@ function route(){
   const home=(!h&&!pm)||h==="home"||h==="how-to";
   $("#v-home").classList.toggle("on",home);$("#v-home-rest").classList.toggle("on",home);
   $("#v-setup").classList.toggle("on",h==="new");
-  const dash=h.startsWith("split-")||!!pm;$("#v-dash").classList.toggle("on",dash);
+  const dash=h.startsWith("split-")||!!pm;$("#v-dash").classList.toggle("on",dash);document.body.classList.toggle("wide",dash);
   $("#hero").classList.toggle("scene-on",home);requestAnimationFrame(()=>scene.paint());
   if(h==="new")buildSetup();
   if(dash){const id=pm?pm[1]:h.slice(6);if(!S||S.id!==id)openSplit(id,!!pm)}
@@ -1022,21 +1042,21 @@ function render(){
   const flags=S.expenses.filter(e=>e.flag).length;
   const me=store.get("cs-me")||"";
   $("#dashBody").innerHTML=`
-  <div class="dash-head">
-    <div><span class="label">${S.readBy?"Filled in by "+esc(S.readBy)+" · check it":"Your split"}</span><br>
-      <input class="trip-name" id="tripName" value="${esc(S.name)}" aria-label="Split name"></div>
-    <div class="meta">${S.members.length} people · ${S.expenses.length} spends · ${rs(total)}${flags?` · <span class="flag">${flags} to check</span>`:""}</div>
-  </div>
-  <span class="label">Members</span>
-  <div class="members" id="members">${S.members.map(m=>`<span class="chip"><input value="${esc(m.name)}" data-mid="${m.id}" aria-label="Member name"><button data-rm="${m.id}" aria-label="Remove ${esc(m.name)}">×</button></span>`).join("")}<button class="btn small" id="addMember">Add person</button></div>
-  <p class="hint">Everyone in the group counts. Someone who never posted won't be found, so add them here. Remove anyone who wasn't on the trip.</p>
   <div class="dash">
+   <div class="dash-main">
+    <div class="dash-head">
+      <div><span class="label">${S.readBy?"Filled in by "+esc(S.readBy)+" · check it":"Your split"}</span><br>
+        <input class="trip-name" id="tripName" value="${esc(S.name)}" aria-label="Split name"></div>
+      <div class="meta">${S.members.length} people · ${S.expenses.length} spends · ${rs(total)}${flags?` · <span class="flag">${flags} to check</span>`:""}</div>
+    </div>
+    <div class="members" id="members"><span class="label" style="margin-right:4px">Members</span>${S.members.map(m=>`<span class="chip"><input value="${esc(m.name)}" data-mid="${m.id}" aria-label="Member name"><button data-rm="${m.id}" aria-label="Remove ${esc(m.name)}">×</button></span>`).join("")}<button class="btn small" id="addMember">Add person</button></div>
+    <p class="hint">Add anyone who never posted in the chat. Remove anyone who wasn't on the trip.</p>
     <div class="payers">${S.members.map(m=>payerCard(m,paid[m.id])).join("")}</div>
-    <div class="rail">
+   </div>
+   <div class="rail">
       <div class="panel">
-        <div class="save-note ${dirty?"":"ok"}" id="saveNote">${dirty?"Unsaved changes. Press Calculate and save to update the link.":(S.savedAt?"Saved "+new Date(S.savedAt).toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"}):"")}</div>
-        <div class="field" style="margin-bottom:10px"><label for="meIn">Editing as</label><input type="text" id="meIn" value="${esc(me)}" placeholder="Your name"></div>
-        <button class="btn primary" style="width:100%" id="saveBtn">Calculate and save</button>
+        <div class="save-note ${dirty?"":"ok"}" id="saveNote">${dirty?"Unsaved changes. Calculate and save to update the link.":(S.savedAt?"Saved "+new Date(S.savedAt).toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"}):"")}</div>
+        <div class="save-row"><input type="text" id="meIn" value="${esc(me)}" placeholder="Your name" aria-label="Editing as"><button class="btn primary" id="saveBtn">Calculate and save</button></div>
         <div class="err-msg" id="saveErr" role="alert"></div>
       </div>
       <div class="panel settle settle-hi" id="settle">${settleHTML()}</div>
@@ -1046,7 +1066,7 @@ function render(){
         <div class="copy-out" id="copyOut" role="status"></div>
       </div>
       ${S.history&&S.history.length?`<div class="panel"><span class="label">Changes</span><ul class="hist">${S.history.slice().reverse().slice(0,8).map(h=>`<li>${esc(h.by)} saved · ${new Date(h.at).toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"})}<br>${esc(h.what)}</li>`).join("")}</ul></div>`:""}
-    </div>
+   </div>
   </div>`;
   bind();
 }
@@ -1093,7 +1113,7 @@ function shareHTML(){
   if(!HOSTED)return `<p style="font-size:13px;color:var(--mute);margin:8px 0 12px">Use Share at the top of this page to copy its link. It opens this exact split. Or copy the summary for WhatsApp.</p><button class="btn small" id="copySum">Copy summary</button>`;
   if(!S.remote)return `<p style="font-size:13px;color:var(--mute);margin:8px 0 0">Press Calculate and save once to get a link for the group.</p>`;
   const wa="https://wa.me/?text="+encodeURIComponent(summaryText());
-  return `<p style="font-size:13px;color:var(--mute);margin:8px 0 10px">Anyone with this link can see and fix this split. No sign-up.</p>
+  return `<p style="font-size:12px;color:var(--mute);margin:4px 0 8px">Anyone with the link can see and fix it. No sign-up.</p>
    <div class="linkbox"><input type="text" readonly value="${esc(shareUrl(S))}" id="shareUrl" aria-label="Link to this split"><button class="btn small" id="copyLink">Copy link</button></div>
    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><a class="btn small wa-btn" href="${esc(wa)}" target="_blank" rel="noopener">Send on WhatsApp</a><button class="btn small" id="copySum">Copy summary</button></div>`;
 }
