@@ -229,15 +229,16 @@ footer{border-top:1px solid var(--line);padding:28px 0 40px;font-size:12px;color
 .tile.on .prog i{width:100%}
 .cs-up small{font-size:11px;color:var(--mute)}
 /* tile 3: dashboard */
-.t3{width:100%;max-width:420px;display:flex;flex-direction:column;gap:12px}
+.t3{width:100%;max-width:470px;display:flex;flex-direction:column;gap:10px}
 .t3-h{display:flex;justify-content:space-between;align-items:baseline}
-.t3-h b{font-family:var(--display);font-weight:400;font-size:24px}
+.t3-h b{font-family:var(--display);font-weight:400;font-size:20px}
 .t3-h span{font-size:12px;color:var(--mute)}
 .t3-row{display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);font-size:13px}
 .t3-row .tk{grid-column:1/-1;display:flex;gap:4px;flex-wrap:wrap}
 .t3-row .tk em{font-style:normal;font-size:10px;padding:1px 7px;border-radius:6px;background:var(--tick);color:var(--ontick)}
 .t3-row .tk em.x{background:transparent;border:1px solid var(--line);color:var(--mute);text-decoration:line-through}
-.t3-set{border-top:1px solid var(--line);padding-top:6px}
+.t3-set{border-top:1px solid var(--line);padding-top:14px}
+.t3 .pay{padding:16px 0}.t3 .pay .nm{font-size:16px}.t3 .pay .amt{font-size:20px}
 /* Ad card */
 .adwrap{padding:30px 0 90px}
 .ad{display:grid;grid-template-columns:270px 1fr;gap:36px;align-items:center;background:var(--ink);color:var(--bg);border-radius:32px;padding:26px 44px 26px 26px;overflow:hidden}
@@ -280,6 +281,25 @@ footer{border-top:1px solid var(--line);padding:28px 0 40px;font-size:12px;color
   .feats b{font-size:21px}
   .feats li{padding:8px 0}
 }
+
+
+.pcs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pc{border:1px solid var(--line);border-radius:12px;background:var(--bg);padding:8px 10px}
+.pc-h{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;border-bottom:1px solid var(--line);padding-bottom:4px;margin-bottom:4px}
+.pc-h b{font-weight:500;font-size:13px}
+.pc-h span{color:var(--mute)}
+.pc-e{display:flex;justify-content:space-between;font-size:12px}
+.pc-m{font-size:10px;color:var(--mute);margin-top:2px}
+.pc-m .part,.exp-meta .part{color:var(--onact);background:var(--act);border-radius:5px;padding:0 5px}
+.settle-hi{background:var(--act);border-color:var(--act);color:var(--onact);border-radius:18px}
+.t3 .settle-hi{padding:10px 16px 4px}
+.settle-hi .label,.settle-hi .totals,.settle-hi .empty,.settle-hi .pay .pays{color:var(--onact);opacity:.7}
+.settle-hi .pay{border-bottom-color:color-mix(in srgb,var(--onact) 18%,transparent);padding:9px 0}
+.settle-hi .pay .nm{font-weight:500;font-size:15px;color:var(--onact)}
+.settle-hi .pay .amt{color:var(--onact);font-size:20px;font-weight:500}
+.t3 .settle-hi .pay .amt{font-size:17px}
+.t3 .settle-hi .pay .nm{font-size:13px}
+.t3 .settle-hi .pay{padding:6px 0}
 
 /* Setup + dashboard */
 .view{display:none}
@@ -649,9 +669,12 @@ function settle(members,expenses){
      <div class="dz2"><div class="chip-file"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3 1h7l3 3v11H3z" fill="none" stroke="currentColor"/></svg>WhatsApp Chat - Kasol trip.zip</div></div>
      <div class="prog"><i></i></div><small>AI is reading 214 messages…</small></div></div>`;
   const tick=e=>M.map(m=>`<em class="${e.shares.includes(m.id)?"":"x"}">${m.name}</em>`).join("");
+  const nOf=id=>id;
+  const meta=e=>{const n=e.shares.length;const each=rs(e.amount/n)+" each";return n===M.length?`everyone · ${each}`:`<span class="part">${n} of ${M.length}</span> · ${each}`};
   $("#t3").innerHTML=`<div class="t3"><div class="t3-h"><b>Kasol trip</b><span>5 people · ${rs(s.total)}</span></div>
-   ${E.filter(e=>e.title!=="transfer to Aman").slice(0,3).map(e=>`<div class="t3-row"><span>${e.title} <span style="color:var(--mute)">· ${e.payer} paid</span></span><span>${rs(e.amount)}</span><div class="tk">${tick(e)}</div></div>`).join("")}
-   <div class="t3-set settle"><span class="label">Who pays whom</span>${s.transfers.map(t=>`<div class="pay"><span><span class="nm">${t.from}</span><span class="pays">pays</span><span class="nm">${t.to}</span></span><span class="amt">${rs(t.amt)}</span></div>`).join("")}</div></div>`;
+   <div class="pcs">${M.map(m=>{const mine=E.filter(e=>e.payer===m.id);if(!mine.length)return"";const tot=mine.reduce((a,e)=>a+e.amount,0);
+     return `<div class="pc"><div class="pc-h"><b>${nOf(m.id)}</b><span>paid ${rs(tot)}</span></div>${mine.map(e=>`<div class="pc-e"><span>${e.title}</span><span>${rs(e.amount)}</span></div><div class="pc-m">${meta(e)}</div>`).join("")}</div>`}).join("")}</div>
+   <div class="settle settle-hi"><div class="totals"><span class="label">Who pays whom</span><span>${s.transfers.length} payments</span></div>${s.transfers.map(t=>`<div class="pay"><span><span class="nm">${t.from}</span><span class="pays">pays</span><span class="nm">${t.to}</span></span><span class="amt">${rs(t.amt)}</span></div>`).join("")}</div></div>`;
 })();
 
 /* ---------- Scroll-driven sections ---------- */
@@ -981,7 +1004,7 @@ function render(){
         <button class="btn primary" style="width:100%" id="saveBtn">Calculate and save</button>
         <div class="err-msg" id="saveErr" role="alert"></div>
       </div>
-      <div class="panel settle" id="settle">${settleHTML()}</div>
+      <div class="panel settle settle-hi" id="settle">${settleHTML()}</div>
       <div class="panel">
         <span class="label">Share</span>
         <p style="font-size:13px;color:var(--mute);margin:8px 0 12px">Use Share at the top of this page to copy its link. It opens this exact split. Or copy the summary for WhatsApp.</p>
